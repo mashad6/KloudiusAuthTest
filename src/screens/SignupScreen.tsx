@@ -11,6 +11,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AuthTextInput from '../components/AuthTextInput';
@@ -25,6 +26,7 @@ const isValidEmail = (value: string) =>
 
 function SignupScreen({ navigation }: Props) {
   const { signup } = useAuth();
+  const insets = useSafeAreaInsets();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -58,7 +60,6 @@ function SignupScreen({ navigation }: Props) {
     } else if (password.length < 6) {
       nextErrors.password = 'Password must be at least 6 characters.';
     }
-
     setErrors(nextErrors);
     return !nextErrors.name && !nextErrors.email && !nextErrors.password;
   };
@@ -71,7 +72,6 @@ function SignupScreen({ navigation }: Props) {
     if (!isValid) {
       return;
     }
-
     setIsSubmitting(true);
     const result = await signup(name.trim(), email.trim().toLowerCase(), password);
     if (!result.ok) {
@@ -84,191 +84,234 @@ function SignupScreen({ navigation }: Props) {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={styles.root}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 24 : 0}
     >
       <TouchableWithoutFeedback accessible={false} onPress={Keyboard.dismiss}>
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
-          contentInsetAdjustmentBehavior="always"
-        >
-          <View style={styles.card}>
-            <View style={styles.header}>
-              <View style={styles.headerIcon}>
-                <Icon name="sparkles-outline" size={22} color={colors.primary} />
+        <View style={styles.inner}>
+
+          {/* Hero Section */}
+          <View style={[styles.hero, { paddingTop: insets.top + 24 }]}>
+            {/* <View style={styles.logoRing}>
+              <View style={styles.logoDot}>
+                <Icon name="sparkles" size={26} color={colors.primaryLight} />
               </View>
-              <View style={styles.headerText}>
-                <Text style={styles.title}>Create account</Text>
-                <Text style={styles.subtitle}>Sign up to get started</Text>
-              </View>
-            </View>
-
-            <AuthTextInput
-              label="Name"
-              placeholder="Jane Doe"
-              autoCapitalize="words"
-              textContentType="name"
-              leftIconName="person-outline"
-              value={name}
-              onChangeText={(value) => {
-                setName(value);
-                if (errors.name) {
-                  setErrors((prev) => ({ ...prev, name: '' }));
-                }
-                resetSubmitError();
-              }}
-              error={errors.name}
-            />
-
-            <AuthTextInput
-              label="Email"
-              placeholder="you@example.com"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              textContentType="emailAddress"
-              leftIconName="mail-outline"
-              value={email}
-              onChangeText={(value) => {
-                setEmail(value);
-                if (errors.email) {
-                  setErrors((prev) => ({ ...prev, email: '' }));
-                }
-                resetSubmitError();
-              }}
-              error={errors.email}
-            />
-
-            <AuthTextInput
-              label="Password"
-              placeholder="Create a password"
-              secureTextEntry={passwordHidden}
-              textContentType="newPassword"
-              leftIconName="lock-closed-outline"
-              value={password}
-              onChangeText={(value) => {
-                setPassword(value);
-                if (errors.password) {
-                  setErrors((prev) => ({ ...prev, password: '' }));
-                }
-                resetSubmitError();
-              }}
-              rightActionLabel="Toggle password visibility"
-              rightActionIconName={passwordHidden ? 'eye-outline' : 'eye-off-outline'}
-              onRightActionPress={() => setPasswordHidden((prev) => !prev)}
-              error={errors.password}
-            />
-
-            {errors.submit ? <Text style={styles.submitError}>{errors.submit}</Text> : null}
-
-            <Pressable
-              accessibilityRole="button"
-              disabled={isDisabled}
-              onPress={handleSignup}
-              style={({ pressed }) => [
-                styles.primaryButton,
-                isDisabled && styles.primaryButtonDisabled,
-                pressed && !isDisabled && styles.primaryButtonPressed,
-              ]}
-            >
-              {isSubmitting ? (
-                <ActivityIndicator color={colors.card} />
-              ) : (
-                <View style={styles.primaryButtonContent}>
-                  <Text style={styles.primaryButtonText}>Signup</Text>
-                  <Icon name="arrow-forward" size={18} color={colors.card} />
-                </View>
-              )}
-            </Pressable>
-
-            <Pressable
-              accessibilityRole="button"
-              onPress={() => navigation.navigate('Login')}
-              style={({ pressed }) => [styles.linkButton, pressed && styles.linkPressed]}
-            >
-              <View style={styles.linkContent}>
-                <Text style={styles.linkText}>Go to Login</Text>
-                <Icon name="arrow-forward-outline" size={16} color={colors.primary} />
-              </View>
-            </Pressable>
+            </View> */}
+            <Text style={styles.heroTitle}>Create Account</Text>
+            <Text style={styles.heroSubtitle}>Join us and get started today</Text>
           </View>
-        </ScrollView>
+
+          {/* Form Panel */}
+          <View style={styles.panel}>
+            <ScrollView
+              contentContainerStyle={styles.panelContent}
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
+              showsVerticalScrollIndicator={false}
+            >
+              <Text style={styles.panelTitle}>Sign Up</Text>
+
+              <AuthTextInput
+                label="Full Name"
+                placeholder="Jane Doe"
+                autoCapitalize="words"
+                textContentType="name"
+                leftIconName="person-outline"
+                value={name}
+                onChangeText={(value) => {
+                  setName(value);
+                  if (errors.name) {
+                    setErrors((prev) => ({ ...prev, name: '' }));
+                  }
+                  resetSubmitError();
+                }}
+                error={errors.name}
+              />
+
+              <AuthTextInput
+                label="Email"
+                placeholder="you@example.com"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                textContentType="emailAddress"
+                leftIconName="mail-outline"
+                value={email}
+                onChangeText={(value) => {
+                  setEmail(value);
+                  if (errors.email) {
+                    setErrors((prev) => ({ ...prev, email: '' }));
+                  }
+                  resetSubmitError();
+                }}
+                error={errors.email}
+              />
+
+              <AuthTextInput
+                label="Password"
+                placeholder="Create a password"
+                secureTextEntry={passwordHidden}
+                textContentType="newPassword"
+                leftIconName="lock-closed-outline"
+                value={password}
+                onChangeText={(value) => {
+                  setPassword(value);
+                  if (errors.password) {
+                    setErrors((prev) => ({ ...prev, password: '' }));
+                  }
+                  resetSubmitError();
+                }}
+                rightActionLabel="Toggle password visibility"
+                rightActionIconName={passwordHidden ? 'eye-outline' : 'eye-off-outline'}
+                onRightActionPress={() => setPasswordHidden((prev) => !prev)}
+                error={errors.password}
+              />
+
+              {errors.submit ? (
+                <View style={styles.submitErrorBox}>
+                  <Icon name="warning-outline" size={14} color={colors.error} />
+                  <Text style={styles.submitErrorText}>{errors.submit}</Text>
+                </View>
+              ) : null}
+
+              <Pressable
+                accessibilityRole="button"
+                disabled={isDisabled}
+                onPress={handleSignup}
+                style={({ pressed }) => [
+                  styles.primaryButton,
+                  isDisabled && styles.primaryButtonDisabled,
+                  pressed && !isDisabled && styles.primaryButtonPressed,
+                ]}
+              >
+                {isSubmitting ? (
+                  <ActivityIndicator color="#FFFFFF" />
+                ) : (
+                  <View style={styles.primaryButtonContent}>
+                    <Text style={styles.primaryButtonText}>Create Account</Text>
+                    <Icon name="arrow-forward" size={18} color="#FFFFFF" />
+                  </View>
+                )}
+              </Pressable>
+
+              <View style={styles.dividerRow}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.dividerText}>or</Text>
+                <View style={styles.dividerLine} />
+              </View>
+
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => navigation.navigate('Login')}
+                style={({ pressed }) => [styles.secondaryButton, pressed && styles.secondaryButtonPressed]}
+              >
+                <Text style={styles.secondaryButtonText}>Already have an account? Sign In</Text>
+              </Pressable>
+            </ScrollView>
+          </View>
+
+        </View>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  root: {
     flex: 1,
     backgroundColor: colors.background,
   },
-  scrollContent: {
-    flexGrow: 1,
-    padding: 24,
-    paddingTop: 48,
-    paddingBottom: 32,
-    justifyContent: 'center',
-  },
-  card: {
-    backgroundColor: colors.card,
-    padding: 24,
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 4,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  headerIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#EEF2FF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  headerText: {
+  inner: {
     flex: 1,
   },
-  title: {
-    fontSize: 26,
+  hero: {
+    alignItems: 'center',
+    paddingBottom: 28,
+    paddingHorizontal: 32,
+  },
+  logoRing: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    borderWidth: 1.5,
+    borderColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  logoDot: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroTitle: {
+    fontSize: 30,
+    fontWeight: '800',
+    color: colors.textLight,
+    letterSpacing: -0.5,
+  },
+  heroSubtitle: {
+    marginTop: 8,
+    fontSize: 15,
+    color: colors.textMuted,
+    letterSpacing: 0.2,
+  },
+  panel: {
+    // flex: 1,
+    backgroundColor: colors.card,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+    height:"100%",
+    // overflow: 'hidden',
+  },
+  panelContent: {
+    padding: 28,
+    paddingTop: 32,
+    paddingBottom: 40,
+  },
+  panelTitle: {
+    fontSize: 20,
     fontWeight: '700',
     color: colors.text,
+    marginBottom: 24,
   },
-  subtitle: {
-    marginTop: 6,
-    fontSize: 16,
-    color: colors.subtext,
+  submitErrorBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: colors.errorBg,
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    marginBottom: 14,
   },
-  submitError: {
+  submitErrorText: {
     color: colors.error,
-    marginBottom: 12,
+    fontSize: 13,
+    fontWeight: '500',
+    flex: 1,
   },
   primaryButton: {
     backgroundColor: colors.primary,
-    paddingVertical: 14,
-    borderRadius: 12,
+    paddingVertical: 16,
+    borderRadius: 14,
     alignItems: 'center',
+    shadowColor: colors.primary,
+    shadowOpacity: 0.45,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 8,
   },
   primaryButtonPressed: {
     backgroundColor: colors.primaryDark,
+    shadowOpacity: 0.2,
   },
   primaryButtonDisabled: {
     backgroundColor: colors.muted,
-  },
-  primaryButtonText: {
-    color: colors.card,
-    fontSize: 16,
-    fontWeight: '600',
+    shadowOpacity: 0,
+    elevation: 0,
   },
   primaryButtonContent: {
     flexDirection: 'row',
@@ -276,20 +319,41 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
   },
-  linkButton: {
-    marginTop: 16,
-    alignItems: 'center',
+  primaryButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
+    letterSpacing: 0.3,
   },
-  linkContent: {
+  dividerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    marginVertical: 20,
+    gap: 12,
   },
-  linkPressed: {
-    opacity: 0.7,
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: colors.border,
   },
-  linkText: {
-    color: colors.primary,
+  dividerText: {
+    color: colors.muted,
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  secondaryButton: {
+    borderWidth: 2,
+    borderColor: colors.border,
+    paddingVertical: 14,
+    borderRadius: 14,
+    alignItems: 'center',
+  },
+  secondaryButtonPressed: {
+    backgroundColor: colors.inputBg,
+  },
+  secondaryButtonText: {
+    color: colors.text,
+    fontSize: 15,
     fontWeight: '600',
   },
 });

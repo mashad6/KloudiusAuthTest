@@ -29,9 +29,9 @@ function RootNavigator() {
   return (
     <Stack.Navigator
       screenOptions={{
-        // headerTitleAlign: 'center',
         headerShown: false,
         contentStyle: { backgroundColor: colors.background },
+        animation: 'slide_from_right',
       }}
     >
       {user ? (
