@@ -46,10 +46,10 @@ npm run ios
 
 ## Screenshots / Demo
 Home screen:
-![Home screen](https://raw.githubusercontent.com/mashad6/KloudiusAuthTest/main/src/screenshot/home.png)
+![Home screen](src/screenshot/home.png)
 
 Login screen:
-![Login screen](https://raw.githubusercontent.com/mashad6/KloudiusAuthTest/main/src/screenshot/login.png)
+![Login screen](src/screenshot/login.png)
 
 Signup screen:
-![Signup screen](https://raw.githubusercontent.com/mashad6/KloudiusAuthTest/main/src/screenshot/signup.png)
+![Signup screen](src/screenshot/signup.png)
