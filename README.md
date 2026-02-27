@@ -44,12 +44,7 @@ npm run ios
 - `src/components/AuthTextInput.tsx`: Shared input component
 - `src/theme/colors.ts`: Shared UI palette
 
-## Screenshots / Demo
-Home screen:
-![Home screen](src/screenshot/home.png)
+## Screenshots 
 
-Login screen:
-![Login screen](src/screenshot/login.png)
+![Demo ](src/screenshot/Demo.png)
 
-Signup screen:
-![Signup screen](src/screenshot/signup.png)
